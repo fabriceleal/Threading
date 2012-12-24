@@ -5,7 +5,8 @@
 
 void hello()
 {
-  std::cout << "printed from a thread!\n";
+  std::thread::id id = std::this_thread::get_id();
+  std::cout << "ID=" << id << " printed from a thread!" << std::endl;
 }
 
 class thread_raii
@@ -30,19 +31,24 @@ public:
 
 void f(int aInt, std::string const& aString)
 {
-  using namespace std;
-  cout << "a int " << aInt << " and a string " << aString << endl;
+  std::thread::id id = std::this_thread::get_id();
+  std::cout << "ID=" << id << " a int " << aInt << " and a string "; 
+  std::cout << aString << std::endl;
 }
 
 void do_stuff(int i)
 {
-  using namespace std;
-  cout << "do_stuff(" << i << ")" << endl;
+  std::thread::id id = std::this_thread::get_id();
+  std::cout << "ID=" << id << " do_stuff(" << i << ")" << std::endl;
 }
 
 
 int main()
 {
+  // Info
+  std::cout << "Hardware threads: " << std::thread::hardware_concurrency();
+  std::cout << std::endl;
+
   // Example 1
   std::thread t(hello);
   t.join();
@@ -59,7 +65,7 @@ int main()
   
   // Example 4
   std::vector<std::thread> threads;
-  for(int i = 0; i<20; ++i)
+  for(int i = 0; i<5; ++i)
     threads.push_back(std::thread(do_stuff, i));
   std::for_each(
 		threads.begin(), 
