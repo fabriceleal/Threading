@@ -19,6 +19,12 @@ bool list1_contains(int val)
   return std::find(list1.begin(), list1.end(), val) != list1.end();
 }
 
+void f()
+{
+  // TODO Put something here ...
+}
+
+
 int main(int argc, char** argv)
 {
   std::thread t(f);
