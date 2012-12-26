@@ -74,7 +74,7 @@ void process_data_thread()
 
       // Wait(mutex, waiting condition)
       // If the wait fails, the mutex is unlocked and
-      // the threads enters in a waiting state
+      // the threads enters in a waiting state;
       // when data_cond is notified through a notify_one(),
       // the thread resumes, reacquiring the lock on the mutex,
       // and checks the condition again
