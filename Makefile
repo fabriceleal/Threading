@@ -7,7 +7,7 @@ SRC_SHARING=sharing.cpp
 SRC_BARE=bare.cpp
 SRC_WAITING=waiting.cpp
 
-all: helloworld sharing
+all: helloworld sharing bare waiting
 
 helloworld:$(SRC_HELLOWORLD)
 	$(CC) $? -o $@ $(FLAGS)
