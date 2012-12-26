@@ -72,7 +72,12 @@ void process_data_thread()
 
       cout << "PROCESS: I will wait for stuff ..." << endl;
 
-      // Wait, pass lock and waiting condition
+      // Wait(mutex, waiting condition)
+      // If the wait fails, the mutex is unlocked and
+      // the threads enters in a waiting state
+      // when data_cond is notified through a notify_one(),
+      // the thread resumes, reacquiring the lock on the mutex,
+      // and checks the condition again
       data_cond.wait(lk, []{ return !data_queue.empty(); });
 
       cout << "PROCESS: I have data to process!" << endl;
