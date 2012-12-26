@@ -10,31 +10,37 @@ public:
   long id;
 };
  
-std::mutex mutex1;
+mutex mutex1;
+mutex mutex2;
 
 // Used to send data between threads
-std::queue<data_chunk> data_queue;
+queue<data_chunk> data_queue;
 
-std::condition_variable data_cond;
+condition_variable data_cond;
+
+const int FIRST = 5;
+const int LAST = 0;
+
+int chunks = FIRST;
 
 data_chunk prepare_data()
 {  
-  static int chunks = 1300;
-
+  lock_guard<mutex> lk(mutex2);
   data_chunk* e = new data_chunk();
-  e->isLast = (0 == chunks);
+  e->isLast = (LAST == chunks);
   e->id = chunks--;
   return *e;
 }
 
 bool has_data()
 {
-  return false;
+  lock_guard<mutex> lk(mutex2);
+  return chunks >= LAST;
 }
 
 void process(data_chunk data)
 {
-  cout << "Processing chunk " << data.id << endl;
+  cout << "PROCESS: Processing chunk " << data.id << endl;
 }
 
 bool is_last_chunk(data_chunk data)
@@ -47,27 +53,42 @@ void prepare_data_thread()
   while(has_data())
     {
       data_chunk const data = prepare_data();
-      std::lock_guard<std::mutex> lk(mutex1);
+      cout << "PREPARE: I give you: " << data.id << endl;
+
+      lock_guard<mutex> lk(mutex1);
       data_queue.push(data);
+
       // Notify waiting thread
       data_cond.notify_one();
     }
+  cout << "PREPARE: I give you no more data!" << endl;
 }
 
 void process_data_thread()
 {
   while(true)
     {
-      std::unique_lock<std::mutex> lk(mutex1);
+      unique_lock<mutex> lk(mutex1);
+
+      cout << "PROCESS: I will wait for stuff ..." << endl;
+
       // Wait, pass lock and waiting condition
       data_cond.wait(lk, []{ return !data_queue.empty(); });
+
+      cout << "PROCESS: I have data to process!" << endl;
+
       data_chunk data = data_queue.front();
       data_queue.pop();
       lk.unlock();
+
       process(data);
       if(is_last_chunk(data))
-	break;
+	{
+	  cout << "PROCESS: I'm done!" << endl;
+	  break;
+	}
     }
+  cout << "PROCESS: No more processing!" << endl;
 }
 
 int main(int argc, char** argv)
