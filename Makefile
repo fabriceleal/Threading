@@ -5,7 +5,7 @@ CC=g++
 FLAGS=--std=c++0x -lpthread
 TARGETS=helloworld sharing bare waiting futures
 
-all: helloworld sharing bare waiting futures
+all: $(TARGETS)
 
 %: %.cpp
 	$(CC) $? -o $@ $(FLAGS)
